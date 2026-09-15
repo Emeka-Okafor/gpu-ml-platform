@@ -1,0 +1,52 @@
+name: Build & Validate Workloads
+
+on:
+  pull_request:
+    paths:
+      - 'workloads/**'
+      - '.github/workflows/workloads.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'workloads/**'
+
+jobs:
+  validate:
+    name: Validate Kubernetes Manifests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup kubeval / kubeconform
+        run: |
+          wget -q https://github.com/yannh/kubeconform/releases/download/v0.6.4/kubeconform-linux-amd64.tar.gz
+          tar -xzf kubeconform-linux-amd64.tar.gz
+          sudo mv kubeconform /usr/local/bin/
+
+      - name: Validate manifests
+        run: |
+          kubeconform -summary -output pretty workloads/training/ || true
+          kubeconform -summary -output pretty workloads/serving/ || true
+
+  # Example: build and push image (uncomment + configure when you have Dockerfiles)
+  # build-and-push:
+  #   name: Build Container Images
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: read
+  #     packages: write
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: docker/setup-buildx-action@v3
+  #     - uses: docker/login-action@v3
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
+  #     - uses: docker/build-push-action@v5
+  #       with:
+  #         context: ./workloads/training
+  #         push: true
+  #         tags: ghcr.io/${{ github.repository }}/training:latest

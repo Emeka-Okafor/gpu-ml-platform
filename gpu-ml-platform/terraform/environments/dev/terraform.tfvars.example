@@ -1,0 +1,14 @@
+aws_region     = "us-east-1"
+project_name   = "gpu-ml-platform"
+owner          = "your-name"
+cluster_name   = "gpu-ml-platform-dev"
+cluster_version = "1.29"
+
+# Keep GPU disabled while learning / developing
+enable_gpu_nodes = false
+gpu_desired_size = 0
+
+# Uncomment and set when you are ready to test real GPU workloads
+# enable_gpu_nodes   = true
+# gpu_instance_types = ["g4dn.xlarge"]
+# gpu_desired_size   = 1
